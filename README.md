@@ -1,6 +1,6 @@
 # IoT Project: ESP32 with AWS IoT Core, DynamoDB, and Grafana
 
-This project demonstrates an IoT solution where an ESP32 equipped with a DHT11 sensor collects temperature and humidity data, uploads it to AWS IoT Core, stores it in DynamoDB, and visualizes it in Grafana.
+This project demonstrates an IoT solution where an ESP32 equipped with a DHT11 sensor collects temperature and humidity data, uploads it to AWS IoT Core, stores it in DynamoDB, and visualizes it in Grafana. Additionally, data can be forwarded to an external API directly from AWS IoT Core.
 
 ---
 
@@ -10,7 +10,7 @@ This project demonstrates an IoT solution where an ESP32 equipped with a DHT11 s
 - Real-time telemetry data collection from a DHT11 sensor.
 - Data storage in AWS DynamoDB for long-term analytics.
 - Visualization using Grafana dashboards.
-- Integration with APIs for ESP32 telemetry data.
+- Forwarding data to an external API via AWS IoT Core rules.
 
 ---
 
@@ -18,13 +18,16 @@ This project demonstrates an IoT solution where an ESP32 equipped with a DHT11 s
 
 ```
 DHT11 Sensor --> ESP32 --> AWS IoT Core --> Lambda --> DynamoDB --> Grafana
+                        \
+                         --> External API
 ```
 
 - **ESP32**: Reads data from the DHT11 sensor and sends it to AWS IoT Core.
-- **AWS IoT Core**: Manages secure communication with the ESP32.
+- **AWS IoT Core**: Manages secure communication and routing of data.
 - **Lambda Function**: Processes incoming telemetry data and stores it in DynamoDB.
 - **DynamoDB**: Stores sensor data for analysis.
 - **Grafana**: Queries DynamoDB and visualizes the data on dashboards.
+- **External API**: Receives data from AWS IoT Core for further processing.
 
 ---
 
@@ -130,7 +133,40 @@ DHT11 Sensor --> ESP32 --> AWS IoT Core --> Lambda --> DynamoDB --> Grafana
 
 ---
 
-### **5. Set Up Grafana**
+### **5. Forward Data to an External API**
+
+1. **Add an HTTP Action**:
+   - In the IoT Rule, add an action to send data to an external HTTP API endpoint.
+   - Specify the endpoint URL, such as `https://example.com/api/data`.
+   - Set the method to `POST`.
+   - Configure headers (e.g., `Content-Type: application/json`).
+   - Ensure the endpoint is accessible and ready to accept incoming requests.
+
+2. **Example Rule SQL Statement**:
+   ```sql
+   SELECT temperature, humidity, timestamp FROM '/telemetry'
+   ```
+
+3. **Test the Rule**:
+   - Use the AWS IoT Core Test feature to publish sample data to the `/telemetry` topic.
+   - Verify that the API receives the data by checking the API logs or responses.
+
+4. **Example API Payload**:
+   The payload sent to the API will look like this:
+   ```json
+   {
+       "temperature": 25.5,
+       "humidity": 60.0,
+       "timestamp": "2024-01-01T12:00:00Z"
+   }
+   ```
+
+5. **Monitor Logs**:
+   - Use AWS CloudWatch to monitor the execution of the IoT Rule and troubleshoot any issues.
+
+---
+
+### **6. Set Up Grafana**
 
 1. **Install the AWS DynamoDB Plugin:**
    - If not already installed, download and install the AWS DynamoDB plugin for Grafana.
@@ -174,7 +210,7 @@ DHT11 Sensor --> ESP32 --> AWS IoT Core --> Lambda --> DynamoDB --> Grafana
 
 ---
 
-### **6. Test the Full Pipeline**
+### **7. Test the Full Pipeline**
 
 1. **Verify Connectivity:**
    - Confirm the ESP32 connects to AWS IoT Core and publishes data.
@@ -184,6 +220,9 @@ DHT11 Sensor --> ESP32 --> AWS IoT Core --> Lambda --> DynamoDB --> Grafana
 
 3. **Visualize Data:**
    - Verify Grafana dashboards display real-time data.
+
+4. **Test API Forwarding:**
+   - Publish sample data to the MQTT topic `/telemetry` and confirm the external API receives the data.
 
 ---
 
