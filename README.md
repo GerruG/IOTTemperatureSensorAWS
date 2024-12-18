@@ -132,13 +132,45 @@ DHT11 Sensor --> ESP32 --> AWS IoT Core --> Lambda --> DynamoDB --> Grafana
 
 ### **5. Set Up Grafana**
 
-1. **Add a Data Source:**
-   - Install the AWS DynamoDB plugin for Grafana.
-   - Configure DynamoDB as a data source.
+1. **Install the AWS DynamoDB Plugin:**
+   - If not already installed, download and install the AWS DynamoDB plugin for Grafana.
+   - Follow the Grafana documentation for plugin installation, or use the plugin marketplace in your Grafana instance.
 
-2. **Create Dashboards:**
-   - Add visualizations for temperature and humidity.
-   - Configure thresholds for alerts.
+2. **Configure AWS Credentials:**
+   - Ensure that your Grafana instance has the correct AWS credentials configured. These credentials must have `dynamodb:Query` permissions for your DynamoDB table.
+   - Add the credentials in one of the following ways:
+     - Use an IAM role if Grafana is hosted on AWS.
+     - Provide an AWS access key and secret key in Grafana's AWS configuration settings.
+
+3. **Add DynamoDB as a Data Source:**
+   - Navigate to **Configuration > Data Sources** in Grafana.
+   - Click **Add data source** and select **AWS DynamoDB**.
+   - Fill in the following fields:
+     - **AWS Region:** Select the AWS region where your DynamoDB table is hosted.
+     - **Default Table Name:** Enter `SensorData` (or the name of your table).
+   - Test the connection to ensure Grafana can query DynamoDB.
+
+4. **Query DynamoDB:**
+   - Use the built-in query editor in Grafana to write queries. For example, to retrieve the latest temperature and humidity data:
+     ```sql
+     SELECT timestamp, temperature, humidity FROM SensorData
+     WHERE timestamp >= '2024-01-01T00:00:00Z'
+     ```
+
+5. **Create Dashboards:**
+   - Navigate to **Create > Dashboard** in Grafana.
+   - Add a new panel with the following settings:
+     - **Query Type:** Select DynamoDB.
+     - **Query:** Use the query editor to define your desired data (e.g., temperature or humidity trends over time).
+   - Select appropriate visualizations, such as time-series graphs, for your panels.
+
+6. **Configure Alerts (Optional):**
+   - Add thresholds for critical temperature or humidity values.
+   - Configure alert notifications using Grafana’s alerting system (e.g., email, Slack).
+
+7. **Test the Dashboard:**
+   - Ensure that real-time data from your DynamoDB table is displayed in the dashboard.
+   - Verify that the data updates as the ESP32 sends new telemetry.
 
 ---
 
