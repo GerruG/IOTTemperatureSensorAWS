@@ -162,7 +162,3 @@ DHT11 Sensor --> ESP32 --> AWS IoT Core --> Lambda --> DynamoDB --> Grafana
 - **Edge Analytics:** Perform preliminary data processing on the ESP32.
 
 ---
-
-## **License**
-
-This project is licensed under the MIT License. See the LICENSE file for details.
