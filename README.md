@@ -226,10 +226,5 @@ DHT11 Sensor --> ESP32 --> AWS IoT Core --> Lambda --> DynamoDB --> Grafana
 
 ---
 
-### **Optional Enhancements**
-
-- **Local Data Buffering:** Store data locally on the ESP32 during network interruptions.
-- **Enhanced Security:** Periodically rotate AWS IoT Core certificates.
-- **Edge Analytics:** Perform preliminary data processing on the ESP32.
 
 ---
